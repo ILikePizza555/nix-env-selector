@@ -1,17 +1,9 @@
-{ nixpkgs ? import <nixpkgs> {} }:
-let
-  inherit (nixpkgs) pkgs;
-
-  nixPackages = [
-    pkgs.nodejs-12_x
-    pkgs.jdk11
-  ];
-in
-pkgs.stdenv.mkDerivation {
-  name = "vscode-env-selector";
-  buildInputs = nixPackages;
-  postInstall =
-    ''
-      yarn install
-    '';
-}
+(import (
+  let
+    lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+  in fetchTarball {
+    url = "https://github.com/edolstra/flake-compat/archive/${lock.nodes.flake-compat.locked.rev}.tar.gz";
+    sha256 = lock.nodes.flake-compat.locked.narHash; }
+) {
+  src =  ./.;
+}).defaultNix
